@@ -1,0 +1,22 @@
+name: Close issues on label
+on:
+  issues:
+    types: [labeled]
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const label = context.payload.label.name;
+            if (label === 'completed' || label === 'wontfix') {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed'
+              });
+            }
